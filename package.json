@@ -1,0 +1,29 @@
+{
+  "name": "desafio_capo_viagens",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "node --import=tsx --watch ./src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EversonDoNascimento/Desafio_Capo_Viagens.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/EversonDoNascimento/Desafio_Capo_Viagens/issues"
+  },
+  "homepage": "https://github.com/EversonDoNascimento/Desafio_Capo_Viagens#readme",
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "tsx": "^4.20.3"
+  },
+  "dependencies": {
+    "fastify": "^5.4.0"
+  }
+}
