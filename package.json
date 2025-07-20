@@ -24,6 +24,8 @@
     "tsx": "^4.20.3"
   },
   "dependencies": {
-    "fastify": "^5.4.0"
+    "dotenv": "^17.2.0",
+    "fastify": "^5.4.0",
+    "zod": "^4.0.5"
   }
 }
