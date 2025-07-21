@@ -8,4 +8,7 @@ export default async function paymentRoutes(server: FastifyInstance) {
   server.post("/payments", (request, reply) =>
     paymentController.create(request, reply)
   );
+  server.get("/payments/:id", async (request, reply) =>
+    paymentController.findPaymentById(request, reply)
+  );
 }
