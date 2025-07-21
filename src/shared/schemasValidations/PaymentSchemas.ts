@@ -10,7 +10,7 @@ export const SchemaCreatePayment = z
       .positive("O valor deve ser positivo"),
     card: z
       .object({
-        number: z.string().length(16, {
+        encryptedData: z.string().length(16, {
           message: "O número do cartão deve ter 16 dígitos.",
         }),
       })
@@ -22,7 +22,15 @@ export const SchemaCreatePayment = z
   })
   .check((ctx) => {
     const data = ctx.value;
-
+    if (data.method === "pix" && data.card) {
+      ctx.issues.push({
+        code: "custom",
+        message:
+          "Informações do cartão não podem ser fornecidas para pagamento com PIX.",
+        path: ["card"],
+        input: data.card,
+      });
+    }
     if (data.method === "credit_card" && !data.card) {
       ctx.issues.push({
         code: "custom",
@@ -33,3 +41,10 @@ export const SchemaCreatePayment = z
       });
     }
   });
+
+export const SchemaFindPaymentById = z.object({
+  id: z.coerce
+    .number("O ID deve ser um número")
+    .int("O ID deve ser um número inteiro")
+    .positive("O ID deve ser positivo"),
+});
