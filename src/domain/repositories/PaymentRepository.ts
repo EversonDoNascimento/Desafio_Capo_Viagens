@@ -1,6 +1,6 @@
 import Payment from "../entities/Payment";
 
-export default class PaymentRepository {
-  async create(payment: Payment) {}
-  async findById(id: string) {}
+export default abstract class PaymentRepository {
+  abstract create(payment: Payment): Promise<{ id?: number; success: boolean }>;
+  abstract findById(id: number): Promise<Payment | null>;
 }
