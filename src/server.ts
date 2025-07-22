@@ -1,6 +1,7 @@
 import fastify from "fastify";
 import dotenv from "dotenv";
 import paymentRoutes from "./interfaces/http/routes/paymentRoutes";
+import refundRoutes from "./interfaces/http/routes/refundRoutes";
 dotenv.config();
 
 const server = fastify({
@@ -8,7 +9,7 @@ const server = fastify({
 });
 
 server.register(paymentRoutes);
-
+server.register(refundRoutes);
 server.listen(
   { port: parseInt(process.env.SERVER_PORT || "3000") },
   (err, address) => {
