@@ -9,6 +9,8 @@ interface PaymentRow extends RowDataPacket {
   card_number: string | null;
   buyer_name: string;
   buyer_email: string;
+  status: "pending" | "completed" | "failed";
+  payment_date: Date;
 }
 
 export default class MySQLPaymentRepository extends PaymentRepository {
@@ -57,6 +59,8 @@ export default class MySQLPaymentRepository extends PaymentRepository {
           id: row.id.toString(),
           amount: parseFloat(row.amount.toString()),
           method: row.method,
+          status: row.status,
+          paymentDate: row.payment_date,
           card: row.card_number
             ? { encryptedData: row.card_number }
             : undefined,
@@ -72,5 +76,26 @@ export default class MySQLPaymentRepository extends PaymentRepository {
     }
 
     return null;
+  }
+
+  async modifyStatusPayment(
+    id: number,
+    status: "pending" | "completed" | "failed"
+  ) {
+    try {
+      const [result] = await pool.query(
+        `UPDATE payments SET status = ? WHERE id = ?`,
+        [status, id]
+      );
+
+      if ("affectedRows" in result && result.affectedRows === 1) {
+        return this.findById(id);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error("Error modifying payment status in MySQL:", error);
+      throw new Error("Failed to modify payment status in MySQL.");
+    }
   }
 }
