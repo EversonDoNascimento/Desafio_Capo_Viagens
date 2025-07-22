@@ -3,3 +3,5 @@
 .env
 /dist/
 /build/
+/src/scripts/dropTables.ts
+/src/infrastructure/db/migrations/dropTables.ts
