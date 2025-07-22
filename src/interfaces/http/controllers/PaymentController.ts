@@ -2,11 +2,13 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import {
   SchemaCreatePayment,
   SchemaFindPaymentById,
+  SchemaStatusPayment,
 } from "../../../shared/schemasValidations/PaymentSchemas";
 import z from "zod";
 import MySQLPaymentRepository from "../../../infrastructure/db/mysql/MySQLPaymentRepository";
 import CreatePayment from "../../../application/use-cases/CreatePayment";
 import { FindPaymentById } from "../../../application/use-cases/FindPaymentById";
+import ModifyStatusPayment from "../../../application/use-cases/ModifyStatusPayment";
 
 export default class PaymentController {
   async healthCheck() {
@@ -53,5 +55,43 @@ export default class PaymentController {
     }
 
     return reply.status(200).send(result);
+  }
+  async modifyStatusPayment(request: FastifyRequest, reply: FastifyReply) {
+    const idValidation = SchemaFindPaymentById.safeParse(request.params);
+    const statusValidation = SchemaStatusPayment.safeParse(request.body);
+    if (!idValidation.success || !statusValidation.success) {
+      return reply.status(400).send({
+        error: "Invalid ID format",
+        issues: [
+          ...(idValidation.error?.issues ?? []),
+          ...(statusValidation.error?.issues ?? []),
+        ],
+      });
+    }
+    const { id } = idValidation.data as z.infer<typeof SchemaFindPaymentById>;
+    const { status } = statusValidation.data as z.infer<
+      typeof SchemaStatusPayment
+    >;
+
+    const mysqlPayment = new MySQLPaymentRepository();
+    const findPaymentByIdUseCase = new FindPaymentById(mysqlPayment);
+    const payment = await findPaymentByIdUseCase.execute(id);
+    if (!payment) {
+      return reply.status(404).send({ error: "Pagamento não encontrado" });
+    }
+    const modifyStatusPaymentUseCase = new ModifyStatusPayment(mysqlPayment);
+    const updatedPaymentStatus = await modifyStatusPaymentUseCase.execute(
+      id,
+      status
+    );
+
+    if (!updatedPaymentStatus) {
+      return reply.status(404).send({ error: "Pagamento nao encontrado" });
+    }
+
+    return reply.status(200).send({
+      message: "Status do pagamento atualizado com sucesso",
+      payment: updatedPaymentStatus,
+    });
   }
 }
