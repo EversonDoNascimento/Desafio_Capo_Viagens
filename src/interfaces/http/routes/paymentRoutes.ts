@@ -11,4 +11,7 @@ export default async function paymentRoutes(server: FastifyInstance) {
   server.get("/payments/:id", async (request, reply) =>
     paymentController.findPaymentById(request, reply)
   );
+  server.patch("/payments/status/:id", (request, reply) =>
+    paymentController.modifyStatusPayment(request, reply)
+  );
 }
