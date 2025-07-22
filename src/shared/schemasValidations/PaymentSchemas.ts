@@ -48,3 +48,9 @@ export const SchemaFindPaymentById = z.object({
     .int("O ID deve ser um número inteiro")
     .positive("O ID deve ser positivo"),
 });
+
+export const SchemaStatusPayment = z.object({
+  status: z.enum(["pending", "completed", "failed"], {
+    message: "O status deve ser 'pending', 'completed' ou 'failed'.",
+  }),
+});
