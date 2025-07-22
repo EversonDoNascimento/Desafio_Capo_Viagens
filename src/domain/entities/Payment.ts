@@ -9,12 +9,15 @@ export type PaymentProps = {
     name: string;
     email: string;
   };
+  status?: "pending" | "completed" | "failed";
+  paymentDate?: Date;
 };
 
 export default class Payment {
   private id?: string;
   private amount: number;
   private method: string;
+  private status: "pending" | "completed" | "failed" = "pending";
   private card?: {
     encryptedData: string;
   };
@@ -22,9 +25,21 @@ export default class Payment {
     name: string;
     email: string;
   };
-  constructor({ id, amount, method, card, buyer }: PaymentProps) {
+  private paymentDate?: Date;
+  constructor({
+    id,
+    amount,
+    method,
+    card,
+    buyer,
+    status,
+    paymentDate,
+  }: PaymentProps) {
     if (id) {
       this.id = id;
+    }
+    if (status) {
+      this.status = status;
     }
     if (amount <= 0) throw new Error("Amount must be greater than zero.");
     if (!["credit_card", "pix"].includes(method)) {
@@ -34,6 +49,7 @@ export default class Payment {
     this.method = method;
     this.card = card;
     this.buyer = buyer;
+    this.paymentDate = paymentDate;
   }
 
   getId() {
@@ -71,5 +87,17 @@ export default class Payment {
       return this.card.encryptedData;
     }
     return null;
+  }
+  getStatus() {
+    return this.status;
+  }
+  setStatus(status: "pending" | "completed" | "failed") {
+    this.status = status;
+  }
+  getPaymentDate() {
+    return this.paymentDate;
+  }
+  setPaymentDate(paymentDate: Date) {
+    this.paymentDate = paymentDate;
   }
 }
