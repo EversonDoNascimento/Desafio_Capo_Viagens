@@ -12,21 +12,16 @@ interface RefundRow extends RowDataPacket {
   refund_date: Date;
 }
 export default class MySQLRefundRepository extends RefundRepository {
-  async create(refund: Refund): Promise<{ id?: number; success: boolean }> {
+  async create(refund: Refund): Promise<Refund | null> {
     try {
       const [result] = await pool.query(
         `INSERT INTO refunds (payment_id, amount, type) VALUES (?, ?, ?)`,
         [refund.getPaymentId(), refund.getAmount(), refund.getType()]
       );
       if ("affectedRows" in result && result.affectedRows === 1) {
-        return {
-          success: true,
-          id: result.insertId,
-        };
+        return this.findById(result.insertId);
       } else {
-        return {
-          success: false,
-        };
+        return null;
       }
     } catch (error) {
       console.error("Error creating refund in MySQL:", error);

@@ -17,11 +17,10 @@ export default class RefundController {
   async partialRefund(request: FastifyRequest, reply: FastifyReply) {
     const validation = SchemaPartialRefund.safeParse(request.body);
     if (!validation.success) {
-      reply.status(400).send({
+      return reply.status(400).send({
         error: "Dados inválidos!",
         issues: validation.error.issues,
       });
-      return;
     }
     const data = request.body as z.infer<typeof SchemaPartialRefund>;
     const mysqlPayment = new MySQLPaymentRepository();
@@ -49,22 +48,18 @@ export default class RefundController {
     const mysqlRefund = new MySQLRefundRepository();
     const createRefundUseCase = new CreateRefund(mysqlRefund);
     const created = await createRefundUseCase.execute(refund);
-    if (!created.success) {
+    if (!created) {
       return reply.status(400).send({ error: "Falha ao criar o reembolso" });
     }
-    return reply.status(201).send({
-      message: "Reembolso criado com sucesso!",
-      id: created.id,
-    });
+    return reply.status(201).send(created);
   }
   async fullRefund(request: FastifyRequest, reply: FastifyReply) {
     const validation = SchemaFullRefund.safeParse(request.body);
     if (!validation.success) {
-      reply.status(400).send({
+      return reply.status(400).send({
         error: "Dados inválidos!",
         issues: validation.error.issues,
       });
-      return;
     }
     const data = request.body as z.infer<typeof SchemaFullRefund>;
     const mysqlPayment = new MySQLPaymentRepository();
@@ -87,13 +82,10 @@ export default class RefundController {
     const mysqlRefund = new MySQLRefundRepository();
     const createRefundUseCase = new CreateRefund(mysqlRefund);
     const created = await createRefundUseCase.execute(refund);
-    if (!created.success) {
+    if (!created) {
       return reply.status(400).send({ error: "Falha ao criar o reembolso" });
     }
-    return reply.status(201).send({
-      message: "Reembolso criado com sucesso!",
-      id: created.id,
-    });
+    return reply.status(201).send(created);
   }
   async findRefundById(request: FastifyRequest, reply: FastifyReply) {
     const validation = SchemaFindRefundById.safeParse(request.params);
@@ -118,14 +110,13 @@ export default class RefundController {
     const statusValidation = SchemaModifyRefundStatus.safeParse(request.body);
 
     if (!idValidation.success || !statusValidation.success) {
-      reply.status(400).send({
+      return reply.status(400).send({
         error: "Dados inválidos!",
         issues: [
           ...(idValidation.error?.issues ?? []),
           ...(statusValidation.error?.issues ?? []),
         ],
       });
-      return;
     }
     const { id } = idValidation.data as z.infer<typeof SchemaFindRefundById>;
     const { status } = statusValidation.data as z.infer<
@@ -145,9 +136,6 @@ export default class RefundController {
         .send({ error: "Falha ao modificar o status do reembolso" });
     }
 
-    return reply.status(200).send({
-      message: "Status do reembolso atualizado com sucesso",
-      refund: modified,
-    });
+    return reply.status(200).send(modified);
   }
 }
