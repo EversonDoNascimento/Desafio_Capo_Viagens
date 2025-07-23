@@ -29,16 +29,3 @@ export default function refundRoutes(server: FastifyInstance) {
     (request, reply) => refundController.modifyRefundStatus(request, reply)
   );
 }
-
-// {
-//     "error": "Dados inválidos!",
-//     "issues": [
-//         {
-//             "code": "too_small",
-//             "message": "Too small: expected number to be >0",
-//             "path": [
-//                 "paymentId"
-//             ]
-//         }
-//     ]
-// }
