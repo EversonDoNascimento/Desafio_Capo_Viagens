@@ -11,17 +11,16 @@ import { FindPaymentById } from "../../../application/use-cases/FindPaymentById"
 import ModifyStatusPayment from "../../../application/use-cases/ModifyStatusPayment";
 
 export default class PaymentController {
-  async healthCheck() {
-    return { message: "ok" };
+  async healthCheck(reply: FastifyReply) {
+    return reply.status(200).send({ status: "OK" });
   }
   async create(request: FastifyRequest, reply: FastifyReply) {
     const validation = SchemaCreatePayment.safeParse(request.body);
     if (!validation.success) {
-      reply.status(400).send({
+      return reply.status(400).send({
         error: "Dados inválidos!",
         issues: validation.error.issues,
       });
-      return;
     }
     const data = request.body as z.infer<typeof SchemaCreatePayment>;
 
@@ -29,21 +28,17 @@ export default class PaymentController {
     const createPaymentUseCase = new CreatePayment(mysqlPayment);
 
     const created = await createPaymentUseCase.execute(data);
-    if (!created.success) {
+    if (!created) {
       return reply.status(400).send({ error: "Falha ao criar o pagamento" });
     }
-    return reply.status(201).send({
-      message: "Pagamento criado com sucesso!",
-      id: created.id,
-    });
+    return reply.status(201).send(created);
   }
   async findPaymentById(request: FastifyRequest, reply: FastifyReply) {
     const validation = SchemaFindPaymentById.safeParse(request.params);
     if (!validation.success) {
-      reply
+      return reply
         .status(400)
         .send({ error: "Invalid ID format", issues: validation.error.issues });
-      return;
     }
 
     const data = request.params as z.infer<typeof SchemaFindPaymentById>;
@@ -89,9 +84,6 @@ export default class PaymentController {
       return reply.status(404).send({ error: "Pagamento nao encontrado" });
     }
 
-    return reply.status(200).send({
-      message: "Status do pagamento atualizado com sucesso",
-      payment: updatedPaymentStatus,
-    });
+    return reply.status(200).send(updatedPaymentStatus);
   }
 }

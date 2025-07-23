@@ -1,7 +1,7 @@
 import Payment from "../entities/Payment";
 
 export default abstract class PaymentRepository {
-  abstract create(payment: Payment): Promise<{ id?: number; success: boolean }>;
+  abstract create(payment: Payment): Promise<Payment | null>;
   abstract findById(id: number): Promise<Payment | null>;
   abstract modifyStatusPayment(
     id: number,

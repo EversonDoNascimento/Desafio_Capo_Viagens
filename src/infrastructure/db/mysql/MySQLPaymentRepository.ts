@@ -14,7 +14,7 @@ interface PaymentRow extends RowDataPacket {
 }
 
 export default class MySQLPaymentRepository extends PaymentRepository {
-  async create(payment: Payment) {
+  async create(payment: Payment): Promise<Payment | null> {
     try {
       const [result] = await pool.query(
         `
@@ -31,14 +31,9 @@ export default class MySQLPaymentRepository extends PaymentRepository {
       );
 
       if ("affectedRows" in result && result.affectedRows === 1) {
-        return {
-          success: true,
-          id: result.insertId,
-        };
+        return this.findById(result.insertId);
       } else {
-        return {
-          success: false,
-        };
+        return null;
       }
     } catch (error) {
       console.error("Error creating payment in MySQL:", error);
