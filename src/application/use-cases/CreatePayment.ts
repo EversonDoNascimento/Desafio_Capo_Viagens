@@ -11,7 +11,7 @@ export default class CreatePayment {
 
   async execute(
     paymentData: z.infer<typeof SchemaCreatePayment>
-  ): Promise<{ id?: number; success: boolean }> {
+  ): Promise<Payment | null> {
     const payment = new Payment(paymentData);
     if (payment.getMethod() == "credit_card" && paymentData.card) {
       const infoCardCrypted = {

@@ -6,7 +6,7 @@ export default class CreateRefund {
     this.refundRepository = refundRepository;
   }
 
-  async execute(refund: Refund): Promise<{ id?: number; success: boolean }> {
+  async execute(refund: Refund): Promise<Refund | null> {
     return await this.refundRepository.create(refund);
   }
 }
