@@ -51,7 +51,7 @@ export default class MySQLPaymentRepository extends PaymentRepository {
       if (rows.length > 0) {
         const row = rows[0];
         return new Payment({
-          id: row.id.toString(),
+          id: row.id,
           amount: parseFloat(row.amount.toString()),
           method: row.method,
           status: row.status,
