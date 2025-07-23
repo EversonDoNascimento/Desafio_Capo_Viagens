@@ -1,5 +1,5 @@
 export type PaymentProps = {
-  id?: string;
+  id?: number;
   amount: number;
   method: string;
   card?: {
@@ -14,7 +14,7 @@ export type PaymentProps = {
 };
 
 export default class Payment {
-  private id?: string;
+  private id?: number;
   private amount: number;
   private method: string;
   private status: "pending" | "completed" | "failed" = "pending";
@@ -55,7 +55,7 @@ export default class Payment {
   getId() {
     return this.id;
   }
-  setId(id: string) {
+  setId(id: number) {
     this.id = id;
   }
   getAmount() {
