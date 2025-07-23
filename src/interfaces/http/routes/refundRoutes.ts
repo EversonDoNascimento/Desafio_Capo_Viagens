@@ -1,19 +1,44 @@
 import { FastifyInstance } from "fastify";
 import RefundController from "../controllers/RefundController";
+import {
+  createFullRefundSchema,
+  createPartialRefundSchema,
+  getRefundByIDSchema,
+  modifyStatusRefundSchema,
+} from "../schemas/refundSchemas";
 
-export default async function refundRoutes(server: FastifyInstance) {
+export default function refundRoutes(server: FastifyInstance) {
   const refundController = new RefundController();
 
-  server.post("/payments/refund-partial", (request, reply) =>
-    refundController.partialRefund(request, reply)
+  server.post(
+    "/payments/refund-partial",
+    { schema: createPartialRefundSchema },
+    (request, reply) => refundController.partialRefund(request, reply)
   );
-  server.post("/payments/refund", async (request, reply) =>
-    refundController.fullRefund(request, reply)
+  server.post(
+    "/payments/refund",
+    { schema: createFullRefundSchema },
+    (request, reply) => refundController.fullRefund(request, reply)
   );
-  server.get("/refund/:id", (request, reply) =>
+  server.get("/refund/:id", { schema: getRefundByIDSchema }, (request, reply) =>
     refundController.findRefundById(request, reply)
   );
-  server.patch("/refund/status/:id", (request, reply) =>
-    refundController.modifyRefundStatus(request, reply)
+  server.patch(
+    "/refund/status/:id",
+    { schema: modifyStatusRefundSchema },
+    (request, reply) => refundController.modifyRefundStatus(request, reply)
   );
 }
+
+// {
+//     "error": "Dados inválidos!",
+//     "issues": [
+//         {
+//             "code": "too_small",
+//             "message": "Too small: expected number to be >0",
+//             "path": [
+//                 "paymentId"
+//             ]
+//         }
+//     ]
+// }
