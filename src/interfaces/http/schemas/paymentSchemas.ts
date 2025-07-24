@@ -244,7 +244,7 @@ export const modifyStatusPaymentSchema = {
           },
         },
       },
-      required: ["id", "amount", "method", "status", "card", "buyer"],
+      required: ["id", "amount", "method", "status", "buyer"],
     },
     400: {
       description: "Erro de validação",
