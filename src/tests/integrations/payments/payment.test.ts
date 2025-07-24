@@ -143,8 +143,18 @@ describe("Testes nas rotas de pagamento", () => {
   });
   describe("Alterar Status do Pagamento", () => {
     it("Deve alterar o status do pagamento", async () => {
+      const createPayment = await request(app.server)
+        .post("/payments")
+        .send({
+          amount: 100,
+          method: "pix",
+          buyer: {
+            name: "João",
+            email: "joao@email.com",
+          },
+        });
       const response = await request(app.server)
-        .patch("/payments/status/1")
+        .patch(`/payments/status/${createPayment.body.id}`)
         .send({
           status: "completed",
         });
@@ -153,7 +163,7 @@ describe("Testes nas rotas de pagamento", () => {
       expect(response.body).toHaveProperty("status");
       expect(response.body.status).toBe("completed");
       expect(response.body).toHaveProperty("id");
-      expect(response.body.id).toBe(1);
+      expect(response.body.id).toBe(createPayment.body.id);
     });
 
     it("Deve retornar erro ao alterar status do pagamento com ID inválido", async () => {
