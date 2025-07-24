@@ -1,4 +1,20 @@
 services:
+  # Criando o serviço backend, que depende do serviço db
+  backend:
+    build: .
+    restart: always
+    container_name: backend
+    # Ele irá ouvir as requisições na porta 3000 do host e enviar para a porta 3000 do container
+    ports:
+      - "3000:3000"
+    networks:
+      - backend_network
+    depends_on:
+      - db
+    # O comando npm run migrate faz com que o as tabelas sejam criadas no banco de dados
+    # O comando npm start inicia o servidor
+    command: sh -c "npm run migrate && npm start"
+
   db:
     image: mysql:8.0
     restart: always
@@ -10,9 +26,19 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
+    # Garante que o container seja executado com o proprietário root
     user: 999:999
+    # Criando um volume para armazenar os dados, pois quando o container for removido, os dados seriam perdidos
     volumes:
       - ./volume_data:/var/lib/mysql
+    networks:
+      - backend_network
 
+# Criando a rede para conectar os serviços
+networks:
+  backend_network:
+    driver: bridge
+    name: "backend_network"
+# Criando um volume para armazenar os dados
 volumes:
   volume_data:
