@@ -17,8 +17,23 @@ afterAll(async () => {
 describe("Testes nas rotas de reembolso", () => {
   describe("Criar Reembolso Total", () => {
     it("Deve criar um novo reembolso total", async () => {
+      const createPayment = await request(app.server)
+        .post("/payments")
+        .send({
+          amount: 100,
+          method: "pix",
+          buyer: {
+            name: "João",
+            email: "joao@email.com",
+          },
+        });
+      await request(app.server)
+        .patch(`/payments/status/${createPayment.body.id}`)
+        .send({
+          status: "completed",
+        });
       const response = await request(app.server).post("/payments/refund").send({
-        paymentId: 1,
+        paymentId: createPayment.body.id,
       });
 
       expect(response.statusCode).toBe(201);
@@ -59,10 +74,25 @@ describe("Testes nas rotas de reembolso", () => {
 
   describe("Criar Reembolso Parcial", () => {
     it("Deve criar um novo reembolso parcial", async () => {
+      const createPayment = await request(app.server)
+        .post("/payments")
+        .send({
+          amount: 100,
+          method: "pix",
+          buyer: {
+            name: "João",
+            email: "joao@email.com",
+          },
+        });
+      await request(app.server)
+        .patch(`/payments/status/${createPayment.body.id}`)
+        .send({
+          status: "completed",
+        });
       const response = await request(app.server)
         .post("/payments/refund-partial")
         .send({
-          paymentId: 1,
+          paymentId: createPayment.body.id,
           amount: 50,
         });
 
