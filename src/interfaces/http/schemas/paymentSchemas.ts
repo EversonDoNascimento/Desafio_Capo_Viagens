@@ -1,3 +1,5 @@
+// Definindo os schemas do swagger das rotas de pagamentos
+
 export const healthCheckSchema = {
   summary: "Verifica a saúde do serviço",
   tags: ["Saúde"],

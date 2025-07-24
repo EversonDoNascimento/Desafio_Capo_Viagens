@@ -1,3 +1,5 @@
+// Definindo os schemas do swagger das rotas de reembolso
+
 export const createPartialRefundSchema = {
   summary: "Cria um reembolso parcial ",
   tags: ["Reembolsos"],

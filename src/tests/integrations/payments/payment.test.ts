@@ -14,9 +14,13 @@ afterAll(async () => {
   await pool.end();
 });
 
+// Testes de integração usando supertest para as rotas de pagamento
+
 describe("Testes nas rotas de pagamento", () => {
   describe("Criar Pagamento", () => {
     it("Deve criar um novo pagamento no PIX", async () => {
+      // Criando a requisição POST para a rota de criação de pagamento
+      // enviando os dados do pagamento
       const response = await request(app.server)
         .post("/payments")
         .send({
@@ -27,7 +31,7 @@ describe("Testes nas rotas de pagamento", () => {
             email: "joao@email.com",
           },
         });
-
+      // Verificando o status da resposta
       expect(response.statusCode).toBe(201);
     });
 
@@ -49,6 +53,7 @@ describe("Testes nas rotas de pagamento", () => {
       expect(response.statusCode).toBe(201);
     });
     it("Deve retornar erro ao criar pagamento com método inválido", async () => {
+      // O método de pagamento debit_card que está sendo passado, irá retornar um erro, o teste deve falhar
       const response = await request(app.server)
         .post("/payments")
         .send({
@@ -64,6 +69,7 @@ describe("Testes nas rotas de pagamento", () => {
     });
 
     it("Deve retornar erro ao criar pagamento sem informações do cartão", async () => {
+      // Se o pagamento for via cartão de crédito, ele precisa de um cartão para ser criado
       const response = await request(app.server)
         .post("/payments")
         .send({
@@ -79,6 +85,7 @@ describe("Testes nas rotas de pagamento", () => {
     });
 
     it("Deve retornar erro ao criar pagamento sem informações do comprador", async () => {
+      // Não podemos criar um pagamento sem informações do comprador
       const response = await request(app.server).post("/payments").send({
         amount: 100,
         method: "pix",
@@ -87,6 +94,7 @@ describe("Testes nas rotas de pagamento", () => {
       expect(response.statusCode).toBe(400);
     });
     it("Deve retornar erro ao criar pagamento com valor negativo", async () => {
+      // Não podemos criar um pagamento com um valor negativo
       const response = await request(app.server)
         .post("/payments")
         .send({
@@ -126,6 +134,7 @@ describe("Testes nas rotas de pagamento", () => {
     });
 
     it("Deve retornar erro ao buscar pagamento com ID inválido", async () => {
+      // Foi passado um ID inválido
       const response = await request(app.server).get("/payments/99999");
 
       expect(response.statusCode).toBe(404);

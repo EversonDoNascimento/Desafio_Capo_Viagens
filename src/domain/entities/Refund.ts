@@ -1,3 +1,4 @@
+// Criando o type RefundProps
 type RefundProps = {
   id?: number;
   paymentId: number;
@@ -7,11 +8,14 @@ type RefundProps = {
   refundDate?: Date;
 };
 
+// Criando a classe Refund
 export default class Refund {
+  // O ID será opcional, pois ele vem do banco de dados
   private id?: number;
   private paymentId: number;
   private amount: number;
   private status: "pending" | "completed" | "failed";
+  // Um reembolso pode ser parcial ou completo
   private type: "partial" | "full";
   private refundDate: Date;
 
@@ -23,6 +27,7 @@ export default class Refund {
     refundDate = new Date(),
     type,
   }: RefundProps) {
+    // Se o reembolso for parcial, o amount deve ser maior que zero
     if (amount <= 0) throw new Error("Amount must be greater than zero.");
     this.id = id;
     this.paymentId = paymentId;
@@ -32,6 +37,7 @@ export default class Refund {
     this.refundDate = refundDate;
   }
 
+  // Getters e Setters
   getId() {
     return this.id;
   }

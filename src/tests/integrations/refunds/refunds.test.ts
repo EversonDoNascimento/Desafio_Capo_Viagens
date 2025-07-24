@@ -74,6 +74,7 @@ describe("Testes nas rotas de reembolso", () => {
 
   describe("Criar Reembolso Parcial", () => {
     it("Deve criar um novo reembolso parcial", async () => {
+      // Para garantir que o teste será feito, o pagamento precisa estar no status completed
       const createPayment = await request(app.server)
         .post("/payments")
         .send({
@@ -84,11 +85,13 @@ describe("Testes nas rotas de reembolso", () => {
             email: "joao@email.com",
           },
         });
+      // Modificando o status do pagamento para completed
       await request(app.server)
         .patch(`/payments/status/${createPayment.body.id}`)
         .send({
           status: "completed",
         });
+      // Criando o reembolso
       const response = await request(app.server)
         .post("/payments/refund-partial")
         .send({
@@ -100,6 +103,7 @@ describe("Testes nas rotas de reembolso", () => {
     });
 
     it("Deve retornar erro ao criar reembolso com paymentId negativo", async () => {
+      // Validando o id do pagamento
       const response = await request(app.server)
         .post("/payments/refund-partial")
         .send({

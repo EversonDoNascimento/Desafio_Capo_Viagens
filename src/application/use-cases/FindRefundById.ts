@@ -6,6 +6,7 @@ export default class FindRefundById {
     this.refundRepository = refundRepository;
   }
   async execute(refundId: number): Promise<Refund | null> {
+    // busca o reembolso pelo ID
     return await this.refundRepository.findById(refundId);
   }
 }

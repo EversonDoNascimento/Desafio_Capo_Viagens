@@ -2,6 +2,7 @@ import Payment from "../../../domain/entities/Payment";
 import PaymentRepository from "../../../domain/repositories/PaymentRepository";
 import pool from "../connection";
 import { RowDataPacket } from "mysql2";
+// Definindo os tipos das colunas da tabela
 interface PaymentRow extends RowDataPacket {
   id: number;
   amount: number;
@@ -15,7 +16,10 @@ interface PaymentRow extends RowDataPacket {
 
 export default class MySQLPaymentRepository extends PaymentRepository {
   async create(payment: Payment): Promise<Payment | null> {
+    // A operação está envolvida em um bloco try-catch, pois pode ocorrer um erro
     try {
+      // insere o pagamento na tabela utilizando a query
+      // o insert into payments (amount, method, card_number, buyer_name, buyer_email)
       const [result] = await pool.query(
         `
         INSERT INTO payments (amount, method, card_number, buyer_name, buyer_email)
@@ -24,15 +28,17 @@ export default class MySQLPaymentRepository extends PaymentRepository {
         [
           payment.getAmount(),
           payment.getMethod(),
+          // Se o retorno de getEncryptedCardIfApplicable for nulo, insere null, caso contrario insere o encryptedData
           payment.getEncryptedCardIfApplicable(),
           payment.getBuyer().name,
           payment.getBuyer().email,
         ]
       );
-
+      // verifica se o pagamento foi criado
       if ("affectedRows" in result && result.affectedRows === 1) {
         return this.findById(result.insertId);
       } else {
+        // caso contrario retorna null
         return null;
       }
     } catch (error) {
@@ -43,13 +49,16 @@ export default class MySQLPaymentRepository extends PaymentRepository {
 
   async findById(id: number): Promise<Payment | null> {
     try {
+      // busca o pagamento pelo ID
       const [rows] = await pool.query<PaymentRow[]>(
         `SELECT * FROM payments WHERE id = ?`,
         [id]
       );
-
+      // verifica se o pagamento foi encontrado
       if (rows.length > 0) {
+        // pegando a primeira linha que contém os dados do pagamento
         const row = rows[0];
+        // criando uma instância da classe Payment para retornar de acordo com o repository
         return new Payment({
           id: row.id,
           amount: parseFloat(row.amount.toString()),
@@ -69,7 +78,7 @@ export default class MySQLPaymentRepository extends PaymentRepository {
       console.error("Error finding payment by ID in MySQL:", error);
       throw new Error("Failed to find payment by ID in MySQL.");
     }
-
+    // retornar null caso não seja encontrado
     return null;
   }
 
@@ -78,14 +87,17 @@ export default class MySQLPaymentRepository extends PaymentRepository {
     status: "pending" | "completed" | "failed"
   ) {
     try {
+      // modifica o status do pagamento
       const [result] = await pool.query(
         `UPDATE payments SET status = ? WHERE id = ?`,
         [status, id]
       );
 
       if ("affectedRows" in result && result.affectedRows === 1) {
+        // Busca o pagamento modificado e retorna
         return this.findById(id);
       } else {
+        // caso contrario retorna null
         return null;
       }
     } catch (error) {

@@ -5,6 +5,8 @@ export default class ModifyStatusRefund {
     this.refundRepository = refundRepository;
   }
   async execute(refundId: number, status: "pending" | "completed" | "failed") {
+    // Apenas o ID do reembolso e o status são necessários para modificar o status
+    // O status pode ser 'pending', 'completed' ou 'failed'
     return await this.refundRepository.modifyStatus(refundId, status);
   }
 }

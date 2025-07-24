@@ -9,6 +9,8 @@ export default class ModifyStatusPayment {
     id: number,
     status: "pending" | "completed" | "failed"
   ): Promise<Payment | null> {
+    // Apenas o ID do pagamento e o status são necessários para modificar o status
+    // O status pode ser 'pending', 'completed' ou 'failed'
     return this.paymentRepository.modifyStatusPayment(id, status);
   }
 }

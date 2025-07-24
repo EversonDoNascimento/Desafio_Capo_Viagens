@@ -1,5 +1,6 @@
 import pool from "../connection";
 
+// Função para criar a tabela de reembolsos
 export async function createRefundTable() {
   await pool.query(`
         CREATE TABLE IF NOT EXISTS refunds (

@@ -1,5 +1,6 @@
 import pool from "../connection";
 
+// Função para criar a tabela de pagamentos
 export async function createPaymentTable() {
   await pool.query(`
         CREATE TABLE IF NOT EXISTS payments (

@@ -15,7 +15,9 @@ import FindRefundById from "../../../application/use-cases/FindRefundById";
 
 export default class RefundController {
   async partialRefund(request: FastifyRequest, reply: FastifyReply) {
+    // Validando os dados
     const validation = SchemaPartialRefund.safeParse(request.body);
+    // Se os dados forem inválidos
     if (!validation.success) {
       return reply.status(400).send({
         error: "Dados inválidos!",
@@ -26,14 +28,18 @@ export default class RefundController {
     const mysqlPayment = new MySQLPaymentRepository();
     const findPaymentByIdUseCase = new FindPaymentById(mysqlPayment);
     const payment = await findPaymentByIdUseCase.execute(data.paymentId);
+    // Verifica se o pagamento foi encontrado, caso contrario retorna 404 e o fluxo para por aqui
     if (!payment) {
       return reply.status(404).send({ error: "Pagamento não encontrado" });
     }
+    // Verifica se o valor do reembolso é maior que o valor do pagamento, pois não é possivel realizar um reembolso maior que o valor do pagamento
     if (payment.getAmount() < data.amount) {
       return reply
         .status(400)
         .send({ error: "Valor do reembolso é maior que o valor do pagamento" });
     }
+    // Para realizar um reembolso parcial o pagamento precisa estar concluido
+
     if (payment.getStatus() !== "completed") {
       return reply.status(400).send({
         error:
@@ -47,13 +53,17 @@ export default class RefundController {
     });
     const mysqlRefund = new MySQLRefundRepository();
     const createRefundUseCase = new CreateRefund(mysqlRefund);
+
     const created = await createRefundUseCase.execute(refund);
+    // Se o reembolso nao for criado
     if (!created) {
       return reply.status(400).send({ error: "Falha ao criar o reembolso" });
     }
+    // O reembolso foi criado com sucesso e retorna o status 201 junto com o reembolso
     return reply.status(201).send(created);
   }
   async fullRefund(request: FastifyRequest, reply: FastifyReply) {
+    // Validando os dados
     const validation = SchemaFullRefund.safeParse(request.body);
     if (!validation.success) {
       return reply.status(400).send({
@@ -65,14 +75,17 @@ export default class RefundController {
     const mysqlPayment = new MySQLPaymentRepository();
     const findPaymentByIdUseCase = new FindPaymentById(mysqlPayment);
     const payment = await findPaymentByIdUseCase.execute(data.paymentId);
+    // Verifica se o pagamento foi encontrado caso contrario retorna 404 e o fluxo para por aqui
     if (!payment) {
       return reply.status(404).send({ error: "Pagamento não encontrado" });
     }
+    // O tipo do reembolso já está sendo definido como full
     const refund = new Refund({
       paymentId: data.paymentId,
       amount: payment.getAmount(),
       type: "full",
     });
+    // Para realizar um reembolso total o pagamento precisa estar concluido
     if (payment.getStatus() !== "completed") {
       return reply.status(400).send({
         error:
@@ -82,13 +95,17 @@ export default class RefundController {
     const mysqlRefund = new MySQLRefundRepository();
     const createRefundUseCase = new CreateRefund(mysqlRefund);
     const created = await createRefundUseCase.execute(refund);
+    // Se o reembolso nao for criado
     if (!created) {
       return reply.status(400).send({ error: "Falha ao criar o reembolso" });
     }
+    // O reembolso foi criado com sucesso e retorna o status 201 junto com o reembolso
     return reply.status(201).send(created);
   }
   async findRefundById(request: FastifyRequest, reply: FastifyReply) {
+    // Validando os dados
     const validation = SchemaFindRefundById.safeParse(request.params);
+    // Se os dados forem inválidos
     if (!validation.success) {
       reply.status(400).send({
         error: "Dados inválidos!",
@@ -100,9 +117,11 @@ export default class RefundController {
     const mysqlRefund = new MySQLRefundRepository();
     const findRefundByIdUseCase = new FindRefundById(mysqlRefund);
     const refund = await findRefundByIdUseCase.execute(data.id);
+    // Se o reembolso nao for encontrado
     if (!refund) {
       return reply.status(404).send({ error: "Reembolso não encontrado" });
     }
+    // O reembolso foi encontrado e retorna o status 200 junto com o reembolso
     return reply.status(200).send(refund);
   }
   async modifyRefundStatus(request: FastifyRequest, reply: FastifyReply) {
@@ -125,17 +144,18 @@ export default class RefundController {
     const mysqlRefund = new MySQLRefundRepository();
     const findRefundByIdUseCase = new FindRefundById(mysqlRefund);
     const refund = await findRefundByIdUseCase.execute(id);
+    // Verificando se o reembolso foi encontrado
     if (!refund) {
       return reply.status(404).send({ error: "Reembolso não encontrado" });
     }
     const modified = await mysqlRefund.modifyStatus(id, status);
-
+    // Verificando se o reembolso foi modificado
     if (!modified) {
       return reply
         .status(400)
         .send({ error: "Falha ao modificar o status do reembolso" });
     }
-
+    // O reembolso foi modificado com sucesso e retorna o status 200 junto com o reembolso
     return reply.status(200).send(modified);
   }
 }
