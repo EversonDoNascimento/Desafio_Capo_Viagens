@@ -322,3 +322,16 @@ PATCH /refund/status/1
 ```
 
 ---
+
+## 📬 Testes com Postman
+
+Você pode testar a API manualmente usando o Postman.
+
+### Como usar:
+
+1. Abra o Postman.
+2. Vá em `File > Import`.
+3. Importe o arquivo `postman/Payment_Gateway_API.postman_collection.json`.
+4. Execute os requests disponíveis na collection.
+
+> As credenciais e URLs devem estar corretas com base no seu `.env` ou ambiente selecionado.

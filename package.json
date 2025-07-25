@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --import=tsx --watch ./src/server.ts",
     "migrate": "node --import=tsx ./src/scripts/migrate.ts",
-    "test": "NODE_ENV=test dotenv -e .env.test.local jest"
+    "test": "dotenv -e .env.test.local jest"
   },
   "repository": {
     "type": "git",
