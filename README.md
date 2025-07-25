@@ -137,7 +137,6 @@ Antes de iniciar o projeto, é necessário criar um arquivo `.env` na raiz com a
 SERVER_PORT=3000
 
 # Chave de criptografia para dados sensíveis (ex: cartão)
-# Modifique a chave se desejar
 ENCRYPTION_KEY=chave-secreta
 
 # Configurações do banco de dados MySQL
